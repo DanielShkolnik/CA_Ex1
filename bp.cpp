@@ -236,7 +236,7 @@ public:
 		int btbRow=indx(pc,this->btbSize);
 		uint32_t tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
-		std::cout << btb.btb[btbRow].tag << " == " << tag << " ";
+		//std::cout << btb.btb[btbRow].tag << " == " << tag << " ";
 		if(this->btb.btb[btbRow].tag == tag) return true;
 		return false;
 
