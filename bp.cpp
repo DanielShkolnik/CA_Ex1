@@ -10,7 +10,8 @@
 #define MID_SHARE 2
 
 int indx(uint32_t pc ,int btbSize){
-	int indx = pc << (32 - (int)log2(btbSize));
+	int indx = pc << 2;
+	indx = indx << (32 - (int)log2(btbSize));
 	indx = indx >> (32 - (int)log2(btbSize));
 	return indx;
 }
@@ -28,7 +29,14 @@ class BTB{
 public:
 	BtbEntry* btb;
 	int btbSize;
-	BTB(unsigned btbSize):btb(new BtbEntry[btbSize]) ,btbSize(btbSize){}
+	unsigned tagSize;
+	BTB(unsigned btbSize ,unsigned tagSize):btb(new BtbEntry[btbSize]) ,btbSize(btbSize) ,tagSize(tagSize){}
+	void addEntry(uint32_t pc ,uint32_t targetPc){
+		int i = indx(pc ,btbSize);
+		btb[i].target = targetPc;
+
+
+	}
 };
 class FSM{
 public:
@@ -55,6 +63,44 @@ public:
 			}
 		}
 	}
+	bool isTaken(int i , unsigned history){
+		if(isGlobalTable){
+			if(fsm[history] > 1) {
+				return true;
+			}else{
+				return  false;
+			}
+		}else{
+			if(fsm[(i*column_size)+history] > 1) {
+				return true;
+			}else{
+				return  false;
+			}
+		}
+	}
+	void strengthen(int i , unsigned history){
+		if(isGlobalTable){
+			if(fsm[history] < 3) {
+				fsm[history]++;
+			}
+		}else{
+			if(fsm[(i*column_size)+history] < 3) {
+				fsm[(i*column_size)+history]++;
+			}
+		}
+	}
+	void weaken(int i , unsigned history){
+		if(isGlobalTable){
+			if(fsm[history] > 0) {
+				fsm[history]--;
+			}
+		}else{
+			if(fsm[(i*column_size)+history] > 0) {
+				fsm[(i*column_size)+history]--;
+			}
+		}
+	}
+
 };
 class History{
 public:
@@ -70,6 +116,13 @@ public:
 				history[i] = 0;
 		}else{
 			history = new unsigned(0);
+		}
+	}
+	unsigned operator()(int i){
+		if(isGlobalHist) {
+			return *history;
+		}else{
+			return history[i];
 		}
 	}
 	void update(int i ,bool taken){
@@ -188,7 +241,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	if(bp->doesExist(pc)){
 		int i = indx(pc ,bp->btbSize);
-		if(bp->fsm.isTaken(i ,bp->history) == taken && targetPc == pred_dst){
+		if(bp->fsm.isTaken(i ,bp->history(i)) == taken && targetPc == pred_dst){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}else{
 			stats.flush_num++;
