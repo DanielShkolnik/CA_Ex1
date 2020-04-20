@@ -53,9 +53,9 @@ public:
 		int i = indx(pc ,btbSize);
 		btb[i].target = targetPc;
 		uint32_t tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
-		std::cout << tagt << std::endl;
+		//std::cout << tagt << std::endl;
 		btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
-		std::cout << btb[i].tag << std::endl;
+		//std::cout << btb[i].tag << std::endl;
 
 	}
 };
@@ -236,7 +236,7 @@ public:
 		int btbRow=indx(pc,this->btbSize);
 		uint32_t tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
-		std::cout << btb.btb[btbRow].tag << " == " << tag << std::endl;
+		std::cout << btb.btb[btbRow].tag << " == " << tag << " ";
 		if(this->btb.btb[btbRow].tag == tag) return true;
 		return false;
 
