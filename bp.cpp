@@ -188,7 +188,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	if(bp->doesExist(pc)){
 		int i = indx(pc ,bp->btbSize);
-		if(bp->fsm.isTaken(i ,bp->history) == taken && bp->btb.target == pred_dst){
+		if(bp->fsm.isTaken(i ,bp->history) == taken && targetPc == pred_dst){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}else{
 			stats.flush_num++;
