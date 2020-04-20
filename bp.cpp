@@ -263,11 +263,11 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 		if(is_taken){
 			*dst = bp->btb.btb[i].target;
 		}else{
-			*dst += 4;
+			*dst = pc + 4;
 		}
 		return is_taken;
 	}else {
-		*dst += 4;
+		*dst = pc + 4;
 		return false;
 	}
 }
