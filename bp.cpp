@@ -259,8 +259,15 @@ int BP_init(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned f
 bool BP_predict(uint32_t pc, uint32_t *dst){
 	if(bp->doesExist(pc)){
 		int i = indx(pc ,bp->btbSize);
-		return bp->fsm.isTaken(i ,bp->history(i));
+		bool is_taken = bp->fsm.isTaken(i ,bp->history(i));
+		if(is_taken){
+			*dst = bp->btb.btb[i].target;
+		}else{
+			*dst += 4;
+		}
+		return is_taken;
 	}else {
+		*dst += 4;
 		return false;
 	}
 }
@@ -284,6 +291,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 }
 
 void BP_GetStats(SIM_stats *curStats){
+
 	*curStats = stats;
 }
 
