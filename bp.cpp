@@ -51,7 +51,8 @@ public:
 	void addEntry(uint32_t pc ,uint32_t targetPc){
 		int i = indx(pc ,btbSize);
 		btb[i].target = targetPc;
-
+		int tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+		btb[i].tag = tagt >> (2 + (int)log2(this->btbSize));
 
 	}
 };
@@ -275,7 +276,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 			bp->fsm.weaken(i ,bp->history(i));
 		}
 	}else {
-		bp->btb.addEntry(pc, targetPc, taken);
+		bp->btb.addEntry(pc, targetPc);
 	}
 	int i = indx(pc ,bp->btbSize);
 	bp->history.update(i ,taken);
