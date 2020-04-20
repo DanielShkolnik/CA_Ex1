@@ -233,7 +233,7 @@ public:
 	bool doesExist(uint32_t pc){
 		int btbRow=indx(pc,this->btbSize);
 		int tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
-		tag = tag >> (2 + (int)log2(this->btbSize));
+		tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		if(this->btb.btb[btbRow].tag == tag) return true;
 		return false;
 
