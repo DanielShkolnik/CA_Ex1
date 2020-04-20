@@ -4,6 +4,7 @@
 #include "bp_api.h"
 #include <bitset>
 #include <math.h>
+#include <iostream>
 
 #define NO_SHARE 0
 #define LSB_SHARE 1
@@ -258,6 +259,7 @@ int BP_init(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned f
 
 bool BP_predict(uint32_t pc, uint32_t *dst){
 	if(bp->doesExist(pc)){
+		std::cout << "does exist" << std::endl;
 		int i = indx(pc ,bp->btbSize);
 		bool is_taken = bp->fsm.isTaken(i ,bp->history(i));
 		if(is_taken){
