@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
-project(CA_Ex1 C)
+project(CA_Ex1)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 14)
 
-add_executable(CA_Ex1 main.c)
+add_executable(CA_Ex1 main.cpp)
