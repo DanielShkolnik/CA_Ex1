@@ -11,7 +11,7 @@
 #define MID_SHARE 2
 
 int indx(uint32_t pc ,int btbSize){
-	int indx = pc << 2;
+	uint32_t indx = pc << 2;
 	indx = indx << (32 - (int)log2(btbSize));
 	indx = indx >> (32 - (int)log2(btbSize));
 	return indx;
@@ -37,7 +37,7 @@ unsigned calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize,
 class BtbEntry{
 public:
 	//bool taken;
-	int tag;
+	uint32_t tag;
 	uint32_t target;
 	//int history;
 	//int* states;
@@ -52,7 +52,7 @@ public:
 	void addEntry(uint32_t pc ,uint32_t targetPc){
 		int i = indx(pc ,btbSize);
 		btb[i].target = targetPc;
-		int tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+		uint32_t tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		std::cout << tagt << std::endl;
 		btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		std::cout << btb[i].tag << std::endl;
@@ -234,7 +234,7 @@ public:
 
 	bool doesExist(uint32_t pc){
 		int btbRow=indx(pc,this->btbSize);
-		int tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+		uint32_t tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		if(this->btb.btb[btbRow].tag == tag) return true;
 		return false;
@@ -249,11 +249,6 @@ static SIM_stats stats;
 int BP_init(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned fsmState,
 			bool isGlobalHist, bool isGlobalTable, int Shared){
 	try{
-		uint32_t i = 0xFFFFFFFF;
-		i = i >>  2;
-		std::cout << "--------    " << i << std::endl;
-		i = i << 1;
-		std::cout << i << std::endl;
 		bp = new BranchPredictor(btbSize, historySize, tagSize, fsmState, isGlobalHist, isGlobalTable, Shared);
 		stats.size = calculateSize(btbSize, historySize, tagSize, isGlobalHist, isGlobalTable);
 		stats.flush_num = 0;
