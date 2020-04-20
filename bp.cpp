@@ -15,6 +15,23 @@ int indx(uint32_t pc ,int btbSize){
 	return indx;
 }
 
+int calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize, bool isGlobalHist,
+				  bool isGlobalTable){
+	if(isGlobalHist && isGlobalTable){
+		return (int)(historySize+2*pow(2,historySize)+btbSize*tagSize);
+	}
+	else if(!isGlobalHist && isGlobalTable){
+		return (int)(btbSize*(tagSize+historySize)+2*pow(2,historySize));
+	}
+	else if(isGlobalHist && !isGlobalTable){
+		return (int)(historySize+btbSize*(tagSize+2*pow(2,historySize)));
+	}
+	else{
+		return (int)(btbSize*(tagSize+historySize+2*pow(2,historySize)));
+	}
+}
+
+
 class BtbEntry{
 public:
 	//bool taken;
@@ -176,7 +193,7 @@ int BP_init(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned f
 			bool isGlobalHist, bool isGlobalTable, int Shared){
 	try{
 		bp = new BranchPredictor(btbSize, historySize, tagSize, fsmState, isGlobalHist, isGlobalTable, Shared);
-		stats.size = calculateSize(btbSize, historySize, tagSize, fsmState, isGlobalHist, isGlobalTable, Shared);
+		stats.size = calculateSize(btbSize, historySize, tagSize, isGlobalHist, isGlobalTable);
 		stats.flush_num = 0;
 		stats.br_num = 0;
 	}catch(std::bad_alloc&) {
