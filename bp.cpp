@@ -16,19 +16,19 @@ int indx(uint32_t pc ,int btbSize){
 	return indx;
 }
 
-int calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize, bool isGlobalHist,
+unsigned calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize, bool isGlobalHist,
 				  bool isGlobalTable){
 	if(isGlobalHist && isGlobalTable){
-		return (int)(historySize+2*pow(2,historySize)+btbSize*tagSize);
+		return (unsigned)(historySize+2*pow(2,historySize)+btbSize*tagSize);
 	}
 	else if(!isGlobalHist && isGlobalTable){
-		return (int)(btbSize*(tagSize+historySize)+2*pow(2,historySize));
+		return (unsigned)(btbSize*(tagSize+historySize)+2*pow(2,historySize));
 	}
 	else if(isGlobalHist && !isGlobalTable){
-		return (int)(historySize+btbSize*(tagSize+2*pow(2,historySize)));
+		return (unsigned)(historySize+btbSize*(tagSize+2*pow(2,historySize)));
 	}
 	else{
-		return (int)(btbSize*(tagSize+historySize+2*pow(2,historySize)));
+		return (unsigned)(btbSize*(tagSize+historySize+2*pow(2,historySize)));
 	}
 }
 
@@ -45,7 +45,7 @@ public:
 class BTB{
 public:
 	BtbEntry* btb;
-	int btbSize;
+	unsigned btbSize;
 	unsigned tagSize;
 	BTB(unsigned btbSize ,unsigned tagSize):btb(new BtbEntry[btbSize]) ,btbSize(btbSize) ,tagSize(tagSize){}
 	void addEntry(uint32_t pc ,uint32_t targetPc){
@@ -216,14 +216,14 @@ public:
 	FSM fsm;
 	History history;
 	uint32_t pc;
-	int tagSize;
+	unsigned tagSize;
 	//unsigned fsmState;
 	int shared;
-	int btbSize;
+	unsigned btbSize;
 
 	BranchPredictor(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned fsmState,
 					bool isGlobalHist, bool isGlobalTable, int Shared) : isGlobalHist(isGlobalHist), isGlobalTable(isGlobalTable),
-																		 btb(btbSize),
+																		 btb(btbSize ,tagSize),
 																		 fsm(isGlobalTable ,btbSize ,historySize ,fsmState),
 																		 history(isGlobalHist ,historySize ,btbSize),
 																		 pc(0) ,tagSize(tagSize) ,shared(shared) ,btbSize(btbSize) {
