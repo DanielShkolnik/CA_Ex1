@@ -54,6 +54,7 @@ public:
 		btb[i].target = targetPc;
 		int tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+		std::cout << btb[i].tag << std::endl;
 
 	}
 };
@@ -259,7 +260,7 @@ int BP_init(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned f
 
 bool BP_predict(uint32_t pc, uint32_t *dst){
 	if(bp->doesExist(pc)){
-		std::cout << "does exist" << std::endl;
+		std::cout << "  does exist  " << std::endl;
 		int i = indx(pc ,bp->btbSize);
 		bool is_taken = bp->fsm.isTaken(i ,bp->history(i));
 		if(is_taken){
