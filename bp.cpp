@@ -53,6 +53,7 @@ public:
 		int i = indx(pc ,btbSize);
 		btb[i].target = targetPc;
 		int tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+		std::cout << tagt << std::endl;
 		btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 		std::cout << btb[i].tag << std::endl;
 
@@ -248,6 +249,11 @@ static SIM_stats stats;
 int BP_init(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned fsmState,
 			bool isGlobalHist, bool isGlobalTable, int Shared){
 	try{
+		uint32_t i = 0xFFFFFFFF;
+		i = i >>  2;
+		std::cout << "--------    " << i << std::endl;
+		i = i << 1;
+		std::cout << i << std::endl;
 		bp = new BranchPredictor(btbSize, historySize, tagSize, fsmState, isGlobalHist, isGlobalTable, Shared);
 		stats.size = calculateSize(btbSize, historySize, tagSize, isGlobalHist, isGlobalTable);
 		stats.flush_num = 0;
