@@ -53,7 +53,7 @@ public:
 		int i = indx(pc ,btbSize);
 		btb[i].target = targetPc;
 		int tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
-		btb[i].tag = tagt >> (2 + (int)log2(this->btbSize));
+		btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
 
 	}
 };
