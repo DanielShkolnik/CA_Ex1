@@ -379,7 +379,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 			bp->fsm.strengthen(i ,sharedi);
 		}
 		else {
-			std::cout << pc << "  flushed  " << std::endl;
+			//std::cout << pc << "  flushed  " << std::endl;
 			stats.flush_num++;
 			bp->fsm.weaken(i ,sharedi);
 		}
