@@ -293,6 +293,7 @@ public:
 		int row = indx(pc,this->btbSize);
 		this->history.print(row);
 		this->fsm.print(row);
+		std::cout << std::endl;
 	}
 
 };
