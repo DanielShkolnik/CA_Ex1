@@ -62,24 +62,24 @@ public:
 class FSM{
 public:
 	bool isGlobalTable;
-	unsigned column_size;
-	unsigned row_size;
+	unsigned rows;
+	unsigned columns;
 	unsigned fsmState;
 	int* fsm;
-	FSM(bool isGlobalTable , unsigned btbSize , unsigned historySize , unsigned fsmState):isGlobalTable(isGlobalTable) ,column_size(-1) ,row_size(pow(2,historySize)) ,fsm(nullptr) ,fsmState(fsmState){
+	FSM(bool isGlobalTable , unsigned btbSize , unsigned historySize , unsigned fsmState):isGlobalTable(isGlobalTable) ,rows(-1) ,columns(pow(2,historySize)) ,fsm(nullptr) ,fsmState(fsmState){
 		if(isGlobalTable){
-			row_size = pow(2 ,historySize);
-			column_size = 1;
-			fsm = new int[row_size];
-			for(int i = 0 ; i < row_size ; i++)
+			columns = pow(2 ,historySize);
+			rows = 1;
+			fsm = new int[columns];
+			for(int i = 0 ; i < columns ; i++)
 				fsm[i] = fsmState;
 		}else{
-			row_size = pow(2 ,historySize);
-			column_size = btbSize;
-			fsm = new int[column_size*row_size];
-			for(int i = 0 ; i < column_size ; i++){
-				for(int j = i ; j < row_size ; j++){
-					fsm[(i*column_size)+j] = fsmState;
+			columns = pow(2 ,historySize);
+			rows = btbSize;
+			fsm = new int[rows*columns];
+			for(int i = 0 ; i < rows ; i++){
+				for(int j = 0 ; j < columns ; j++){
+					fsm[(i*columns)+j] = fsmState;
 				}
 			}
 		}
@@ -92,7 +92,7 @@ public:
 				return  false;
 			}
 		}else{
-			if(fsm[(i*column_size)+history] > 1) {
+			if(fsm[(i*rows)+history] > 1) {
 				return true;
 			}else{
 				return  false;
@@ -109,11 +109,11 @@ public:
             }
 		}else{
 			std::cout << "fsm[0,2]" << fsm[2] << std::endl;
-            if(fsm[(row*column_size)+history] == 1) {
-                fsm[(row*column_size)+history]--;
+            if(fsm[(row*rows)+history] == 1) {
+                fsm[(row*rows)+history]--;
             }
-            else if(fsm[(row*column_size)+history] ==2) {
-                fsm[(row*column_size)+history]++;
+            else if(fsm[(row*rows)+history] ==2) {
+                fsm[(row*rows)+history]++;
             }
 		}
 	}
@@ -127,19 +127,19 @@ public:
 			}
 		}else{
 			std::cout << "fsm[0,2]" << fsm[2] << std::endl;
-			if(fsm[(i*column_size)+history] ==1 || fsm[(i*column_size)+history] ==0) {
-				fsm[(i*column_size)+history]++;
+			if(fsm[(i*rows)+history] ==1 || fsm[(i*rows)+history] ==0) {
+				fsm[(i*rows)+history]++;
 			}
-			else if(fsm[(i*column_size)+history] ==2 || fsm[(i*column_size)+history] ==3) {
-                fsm[(i*column_size)+history]--;
+			else if(fsm[(i*rows)+history] ==2 || fsm[(i*rows)+history] ==3) {
+                fsm[(i*rows)+history]--;
             }
 		}
 	}
 
 	void reset(int row){
 		if(!isGlobalTable){
-			for(int i = 0 ; i < column_size ; i++){
-				fsm[(row*column_size)+i] = fsmState;
+			for(int i = 0 ; i < columns ; i++){
+				fsm[(row*columns)+i] = fsmState;
 			}
 		}
 	}
@@ -147,13 +147,13 @@ public:
 	void print(int row){
 		if(isGlobalTable) {
 			std::cout << "fsm - ";
-			for(int i = 0 ; i < row_size ; i++)
+			for(int i = 0 ; i < columns ; i++)
 				std::cout << fsm[i] << ",";
 		}
 		else{
 			std::cout << "fsm - ";
-			for(int i = 0 ; i < row_size ; i++){
-				std::cout << fsm[(row*column_size)+i] << ",";
+			for(int i = 0 ; i < columns ; i++){
+				std::cout << fsm[(row*columns)+i] << ",";
 			}
 			std::cout << std::endl;
 		}
@@ -336,7 +336,6 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	int i = indx(pc ,bp->btbSize);
 	if(bp->doesExist(pc)){
-		std::cout <<  "doesExist" << std::endl;
 		bp->print(pc);
 		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
 			bp->fsm.strengthen(i ,bp->history(i));
