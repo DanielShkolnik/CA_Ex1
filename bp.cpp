@@ -109,15 +109,15 @@ public:
             }
 		}else{
 			std::cout << "fsm[0,2]" << fsm[2] << std::endl;
-            if(fsm[(row*rows)+history] == 1) {
-                fsm[(row*rows)+history]--;
+            if(fsm[(row*columns)+history] == 1) {
+                fsm[(row*columns)+history]--;
             }
-            else if(fsm[(row*rows)+history] ==2) {
-                fsm[(row*rows)+history]++;
+            else if(fsm[(row*columns)+history] ==2) {
+                fsm[(row*columns)+history]++;
             }
 		}
 	}
-	void weaken(int i , unsigned history){
+	void weaken(int row , unsigned history){
 		if(isGlobalTable){
 			if(fsm[history] == 1 || fsm[history] == 0 ) {
 				fsm[history]++;
@@ -127,11 +127,11 @@ public:
 			}
 		}else{
 			std::cout << "fsm[0,2]" << fsm[2] << std::endl;
-			if(fsm[(i*rows)+history] ==1 || fsm[(i*rows)+history] ==0) {
-				fsm[(i*rows)+history]++;
+			if(fsm[(row*columns)+history] ==1 || fsm[(row*columns)+history] ==0) {
+				fsm[(row*columns)+history]++;
 			}
-			else if(fsm[(i*rows)+history] ==2 || fsm[(i*rows)+history] ==3) {
-                fsm[(i*rows)+history]--;
+			else if(fsm[(row*columns)+history] ==2 || fsm[(row*columns)+history] ==3) {
+                fsm[(row*columns)+history]--;
             }
 		}
 	}
