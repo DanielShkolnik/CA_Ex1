@@ -336,6 +336,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	int i = indx(pc ,bp->btbSize);
 	if(bp->doesExist(pc)){
+		std::cout <<  "doesExist" << std::endl;
 		bp->print(pc);
 		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
 			bp->fsm.strengthen(i ,bp->history(i));
