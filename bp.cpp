@@ -85,7 +85,7 @@ public:
 	unsigned fsmState;
 	int* fsm;
 	FSM(bool isGlobalTable , unsigned btbSize , unsigned historySize , unsigned fsmState):
-	isGlobalTable(isGlobalTable) ,rows(-1) ,columns(pow(2,historySize)) ,fsm(nullptr) ,fsmState(fsmState){
+	isGlobalTable(isGlobalTable) ,rows(-1) ,columns(pow(2,historySize)) ,fsmState(fsmState), fsm(nullptr) {
 		if(isGlobalTable){
 			columns = pow(2 ,historySize);
 			rows = 1;
