@@ -92,7 +92,7 @@ public:
 				return  false;
 			}
 		}else{
-			if(fsm[(i*rows)+history] > 1) {
+			if(fsm[(i*columns)+history] > 1) {
 				return true;
 			}else{
 				return  false;
@@ -202,7 +202,7 @@ public:
 		}
 		if(size == 1) {
 			std::bitset<1> temp(*to_update);
-			temp << 1;
+			temp <<= 1;
 			temp[0] = taken;
 			*to_update = temp.to_ulong();
 			return;
@@ -215,42 +215,42 @@ public:
 			return;
 		}if(size == 3) {
 			std::bitset<3> temp(*to_update);
-			temp << 1;
+			temp <<= 1;
 			temp[0] = taken;
 			*to_update = temp.to_ulong();
 			return;
 		}
 		if(size == 4) {
 			std::bitset<4> temp(*to_update);
-			temp << 1;
+			temp <<= 1;
 			temp[0] = taken;
 			*to_update = temp.to_ulong();
 			return;
 		}
 		if(size == 5) {
 			std::bitset<5> temp(*to_update);
-			temp << 1;
+			temp <<= 1;
 			temp[0] = taken;
 			*to_update = temp.to_ulong();
 			return;
 		}
 		if(size == 6) {
 			std::bitset<6> temp(*to_update);
-			temp << 1;
+			temp <<= 1;
 			temp[0] = taken;
 			*to_update = temp.to_ulong();
 			return;
 		}
 		if(size == 7) {
 			std::bitset<7> temp(*to_update);
-			temp << 1;
+			temp <<= 1;
 			temp[0] = taken;
 			*to_update = temp.to_ulong();
 			return;
 		}
 		if(size == 8) {
 			std::bitset<8> temp(*to_update);
-			temp << 1;
+			temp <<= 1;
 			temp[0] = taken;
 			*to_update = temp.to_ulong();
 			return;
