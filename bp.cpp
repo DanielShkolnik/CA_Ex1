@@ -346,6 +346,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		bp->history.reset(i);
 		bp->fsm.reset(i);
 	}
+	bp->print(pc);
 	if(taken) {
 		bp->fsm.strengthen(i, bp->history(i));
 	}else{
