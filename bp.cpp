@@ -108,7 +108,6 @@ public:
                 fsm[history]++;
             }
 		}else{
-			std::cout << "fsm[0,2]" << fsm[2] << std::endl;
             if(fsm[(row*columns)+history] == 1) {
                 fsm[(row*columns)+history]--;
             }
@@ -126,7 +125,6 @@ public:
                 fsm[history]--;
 			}
 		}else{
-			std::cout << "fsm[0,2]" << fsm[2] << std::endl;
 			if(fsm[(row*columns)+history] ==1 || fsm[(row*columns)+history] ==0) {
 				fsm[(row*columns)+history]++;
 			}
@@ -211,7 +209,7 @@ public:
 		}
 		if(size == 2) {
 			std::bitset<2> temp(*to_update);
-			temp << 1;
+			temp <<= 1;
 			temp[0] = taken;
 			*to_update = temp.to_ulong();
 			return;
