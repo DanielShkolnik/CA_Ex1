@@ -14,6 +14,7 @@ int indx(uint32_t pc ,int btbSize){
 	uint32_t indx = pc >> 2;
 	indx = indx << (32 - (int)log2(btbSize));
 	indx = indx >> (32 - (int)log2(btbSize));
+	std::cout << "row in btb: " << indx << std::endl;
 	return indx;
 }
 
