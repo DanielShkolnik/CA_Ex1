@@ -334,7 +334,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	int i = indx(pc ,bp->btbSize);
 	if(bp->doesExist(pc)){
-		bp->print(pc);
+		//bp->print(pc);
 		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}else{
@@ -346,7 +346,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		bp->btb.addEntry(pc, targetPc);
 		bp->history.reset(i);
 		bp->fsm.reset(i);
-		bp->print(pc);
+		//bp->print(pc);
 		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}
@@ -357,7 +357,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		}
 	}
 	bp->history.update(i ,taken);
-	bp->print(pc);
+	//bp->print(pc);
 }
 
 void BP_GetStats(SIM_stats *curStats){
