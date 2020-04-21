@@ -108,6 +108,7 @@ public:
                 fsm[history]++;
             }
 		}else{
+			std::cout << "fsm[0,2]" << fsm[2] << std::endl;
             if(fsm[(row*column_size)+history] == 1) {
                 fsm[(row*column_size)+history]--;
             }
@@ -125,6 +126,7 @@ public:
                 fsm[history]--;
 			}
 		}else{
+			std::cout << "fsm[0,2]" << fsm[2] << std::endl;
 			if(fsm[(i*column_size)+history] ==1 || fsm[(i*column_size)+history] ==0) {
 				fsm[(i*column_size)+history]++;
 			}
@@ -351,6 +353,8 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}
 		else {
+			std::cout << pc << "  flushed  " << std::endl;
+			stats.flush_num++;
 			bp->fsm.weaken(i ,bp->history(i));
 		}
 	}
