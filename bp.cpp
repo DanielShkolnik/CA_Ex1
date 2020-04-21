@@ -370,7 +370,10 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	int i = indx(pc ,bp->btbSize);
+    std::cout <<"row: " << i << std::endl;
+    std::cout <<"bp->history(i): " << bp->history(i) << std::endl;
 	int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
+    std::cout <<"bp->history(i): " << sharedi << std::endl;
 	if(bp->doesExist(pc)){
 		bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
