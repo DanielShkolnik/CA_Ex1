@@ -71,14 +71,14 @@ public:
 			columns = pow(2 ,historySize);
 			rows = 1;
 			fsm = new int[columns];
-			for(int i = 0 ; i < columns ; i++)
+			for(unsigned i = 0 ; i < columns ; i++)
 				fsm[i] = fsmState;
 		}else{
 			columns = pow(2 ,historySize);
 			rows = btbSize;
 			fsm = new int[rows*columns];
-			for(int i = 0 ; i < rows ; i++){
-				for(int j = 0 ; j < columns ; j++){
+			for(unsigned i = 0 ; i < rows ; i++){
+				for(unsigned j = 0 ; j < columns ; j++){
 					fsm[(i*columns)+j] = fsmState;
 				}
 			}
@@ -136,7 +136,7 @@ public:
 
 	void reset(int row){
 		if(!isGlobalTable){
-			for(int i = 0 ; i < columns ; i++){
+			for(unsigned i = 0 ; i < columns ; i++){
 				fsm[(row*columns)+i] = fsmState;
 			}
 		}
@@ -145,12 +145,12 @@ public:
 	void print(int row){
 		if(isGlobalTable) {
 			std::cout << "fsm - ";
-			for(int i = 0 ; i < columns ; i++)
+			for(unsigned i = 0 ; i < columns ; i++)
 				std::cout << fsm[i] << ",";
 		}
 		else{
 			std::cout << "fsm - ";
-			for(int i = 0 ; i < columns ; i++){
+			for(unsigned i = 0 ; i < columns ; i++){
 				std::cout << fsm[(row*columns)+i] << ",";
 			}
 			std::cout << std::endl;
