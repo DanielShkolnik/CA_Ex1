@@ -20,16 +20,16 @@ int indx(uint32_t pc ,int btbSize){
 unsigned calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize, bool isGlobalHist,
 				  bool isGlobalTable){
 	if(isGlobalHist && isGlobalTable){
-		return (unsigned)(historySize+2*pow(2,historySize)+btbSize*tagSize);
+		return (unsigned)(historySize+2*pow(2,historySize)+btbSize*(tagSize+30));
 	}
 	else if(!isGlobalHist && isGlobalTable){
-		return (unsigned)(btbSize*(tagSize+historySize)+2*pow(2,historySize));
+		return (unsigned)(btbSize*((tagSize+30)+historySize)+2*pow(2,historySize));
 	}
 	else if(isGlobalHist && !isGlobalTable){
-		return (unsigned)(historySize+btbSize*(tagSize+2*pow(2,historySize)));
+		return (unsigned)(historySize+btbSize*((tagSize+30)+2*pow(2,historySize)));
 	}
 	else{
-		return (unsigned)(btbSize*(tagSize+historySize+2*pow(2,historySize)));
+		return (unsigned)(btbSize*((tagSize+30)+historySize+2*pow(2,historySize)));
 	}
 }
 
