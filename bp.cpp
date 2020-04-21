@@ -764,19 +764,19 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 }
 
 void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
-    std::cout << "history - " << global_var_btb->history_g[0] << "  ";
-    std::cout << "fsm - ";
-    for(auto i=global_var_btb->fsm_g->begin(); i!=global_var_btb->fsm_g->end(); i++){
-        std::cout << i->cur << ",";
-    }
-    std::cout << std::endl;
+    //std::cout << "history - " << global_var_btb->history_g[0] << "  ";
+    //std::cout << "fsm - ";
+    //for(auto i=global_var_btb->fsm_g->begin(); i!=global_var_btb->fsm_g->end(); i++){
+    //   std::cout << i->cur << ",";
+    //}
+    //std::cout << std::endl;
     global_var_btb->update(pc,targetPc,taken,pred_dst);
-    std::cout << "history - " << global_var_btb->history_g[0] << "  ";
-    std::cout << "fsm - ";
-    for(auto i=global_var_btb->fsm_g->begin(); i!=global_var_btb->fsm_g->end(); i++){
-        std::cout << i->cur << ",";
-    }
-    std::cout << std::endl;
+    //std::cout << "history - " << global_var_btb->history_g[0] << "  ";
+    //std::cout << "fsm - ";
+    //for(auto i=global_var_btb->fsm_g->begin(); i!=global_var_btb->fsm_g->end(); i++){
+    //    std::cout << i->cur << ",";
+    //}
+    //std::cout << std::endl;
     return ;
 }
 
