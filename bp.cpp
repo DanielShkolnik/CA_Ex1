@@ -130,6 +130,7 @@ public:
                 fsm[history]++;
             }
 		}else{
+		    std::cout << "row: " << row << "  history: " << history << std::endl;
             if(fsm[(row*columns)+history] == 1) {
                 fsm[(row*columns)+history]--;
             }
@@ -147,6 +148,7 @@ public:
                 fsm[history]--;
 			}
 		}else{
+            std::cout << "row: " << row << "  history: " << history << std::endl;
 			if(fsm[(row*columns)+history] ==1 || fsm[(row*columns)+history] ==0) {
 				fsm[(row*columns)+history]++;
 			}
