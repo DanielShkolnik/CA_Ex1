@@ -17,9 +17,9 @@ int indx(uint32_t pc ,int btbSize){
 	return indx;
 }
 
-int sharedIndx( uint32_t pc, int history, unsigned historySize, int shared, int btbSize){
+int sharedHistory( uint32_t pc, int history, unsigned historySize, int shared, int btbSize){
 	if(shared==NO_SHARE){
-		return indx(pc,btbSize);
+		return history;
 	}
 	else if(shared==LSB_SHARE){
 		uint32_t indx = pc >> 2;
@@ -338,7 +338,7 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 	if(bp->doesExist(pc)){
 		//std::cout << "  does exist  " << std::endl;
 		int i = indx(pc ,bp->btbSize);
-		int sharedi=sharedIndx(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
+		int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 		bool is_taken = bp->fsm.isTaken(i ,sharedi);
 		if(is_taken){
 			*dst = bp->btb.btb[i].target;
@@ -355,7 +355,7 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	int i = indx(pc ,bp->btbSize);
-	int sharedi=sharedIndx(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
+	int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 	if(bp->doesExist(pc)){
 		bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
