@@ -377,7 +377,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
     //std::cout <<"bp->history(i): " << sharedi << std::endl;
 	if(bp->doesExist(pc) && pred_dst==targetPc){
-		//bp->print(pc);
+		bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}else{
@@ -390,7 +390,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		bp->btb.addEntry(pc, targetPc);
         bp->fsm.reset(i);
 		bp->history.reset(i);
-		//bp->print(pc);
+		bp->print(pc);
         sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
@@ -402,7 +402,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		}
 	}
 	bp->history.update(i ,taken);
-	//bp->print(pc);
+	bp->print(pc);
 }
 
 void BP_GetStats(SIM_stats *curStats){
