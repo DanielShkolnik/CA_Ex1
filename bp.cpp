@@ -370,7 +370,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	int i = indx(pc ,bp->btbSize);
 	int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 	if(bp->doesExist(pc)){
-		//bp->print(pc);
+		bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}else{
@@ -383,7 +383,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		bp->btb.addEntry(pc, targetPc);
         bp->fsm.reset(i);
 		bp->history.reset(i);
-		//bp->print(pc);
+		bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}
@@ -394,7 +394,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		}
 	}
 	bp->history.update(i ,taken);
-	//bp->print(pc);
+	bp->print(pc);
 }
 
 void BP_GetStats(SIM_stats *curStats){
