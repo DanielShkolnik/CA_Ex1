@@ -150,7 +150,7 @@ public:
 		}
 		else{
 			std::cout << "fsm - ";
-			for(int i = 0 ; i < column_size ; i++){
+			for(int i = 0 ; i < row_size ; i++){
 				std::cout << fsm[(row*column_size)+i] << ",";
 			}
 			std::cout << std::endl;
