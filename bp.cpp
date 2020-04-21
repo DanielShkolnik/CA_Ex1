@@ -14,7 +14,6 @@ int indx(uint32_t pc ,int btbSize){
 	uint32_t indx = pc >> 2;
 	indx = indx << (32 - (int)log2(btbSize));
 	indx = indx >> (32 - (int)log2(btbSize));
-	std::cout << "row in btb: " << indx << std::endl;
 	return indx;
 }
 
@@ -143,6 +142,21 @@ public:
 		}
 	}
 
+	void print(int row){
+		if(isGlobalTable) {
+			std::cout << "fsm - ";
+			for(int i = 0 ; i < row_size ; i++)
+				std::cout << fsm[i] << ",";
+		}
+		else{
+			std::cout << "fsm - ";
+			for(int i = 0 ; i < column_size ; i++){
+				std::cout << fsm[(row*column_size)+i] << ",";
+			}
+			std::cout << std::endl;
+		}
+	}
+
 };
 class History{
 public:
@@ -170,6 +184,14 @@ public:
 	}
 	void reset(int row){
 		if(!isGlobalHist) history[row]=0;
+	}
+	void print(int row){
+		if(isGlobalHist) {
+			std::cout << "history - " << history[0] << "  ";
+		}
+		else{
+			std::cout << "history - " << history[row] << "  ";
+		}
 	}
 	void update(int i ,bool taken){
 		unsigned* to_update = nullptr;
@@ -265,6 +287,12 @@ public:
 		if(this->btb.btb[btbRow].tag == tag) return true;
 		return false;
 
+	}
+
+	void print(uint32_t pc){
+		int row = indx(pc,this->btbSize);
+		this->history.print(row);
+		this->fsm.print(row);
 	}
 
 };
