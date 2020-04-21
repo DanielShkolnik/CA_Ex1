@@ -1,7 +1,7 @@
 /* 046267 Computer Architecture - Spring 2020 - HW #1 */
 /* This file should hold your implementation of the predictor simulator */
 
-/*
+
 
 #include "bp_api.h"
 #include <bitset>
@@ -377,7 +377,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
     //std::cout <<"bp->history(i): " << sharedi << std::endl;
 	if(bp->doesExist(pc)){
-		//bp->print(pc);
+		bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}else{
@@ -390,7 +390,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		bp->btb.addEntry(pc, targetPc);
         bp->fsm.reset(i);
 		bp->history.reset(i);
-		//bp->print(pc);
+		bp->print(pc);
         sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
@@ -402,7 +402,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		}
 	}
 	bp->history.update(i ,taken);
-	//bp->print(pc);
+	bp->print(pc);
 }
 
 void BP_GetStats(SIM_stats *curStats){
@@ -410,11 +410,11 @@ void BP_GetStats(SIM_stats *curStats){
 	*curStats = stats;
 }
 
- */
 
 
-/* 046267 Computer Architecture - Spring 2019 - HW #1 */
-/* This file should hold your implementation of the predictor simulator */
+
+
+/*
 
 #include "bp_api.h"
 
@@ -429,10 +429,7 @@ typedef  enum {NOT_USING_SHARE=0,USING_SHARE_LSB=1,USING_SHARE_MID=2} share_type
 typedef  enum {SNT,WNT,WT,ST} FSM_STATE;
 
 
-/*!
- * cut_address I/O : the adress we want to cut (get only 'chunck' bits from it )
- * 					from the middle
- */
+
 uint32_t cut_address(uint32_t adress , uint32_t chunk ,uint32_t div){
     assert(chunk<32);
     uint32_t res =adress;
@@ -442,9 +439,7 @@ uint32_t cut_address(uint32_t adress , uint32_t chunk ,uint32_t div){
     mask = mask >> (32-chunk);
     return mask & res ;
 }
-/*!
- * the hashing function to find the right fsm machine at the fsm table
- */
+
 unsigned hash_func(uint32_t cur_pc, unsigned history , unsigned history_size ,share_type share_type ){
     unsigned res;
     unsigned mask=1;
@@ -503,12 +498,7 @@ public:
 
 };
 
-/*!row class contains :
- * tag
- * dest
- * pointer to fsm machine
- * poiter to fsm table
- */
+
 class row
 {
     uint32_t tag = 1;
@@ -796,7 +786,7 @@ void BP_GetStats(SIM_stats *curStats){
     global_var_btb= nullptr;
     return;
 }
-
+*/
 
 
 
