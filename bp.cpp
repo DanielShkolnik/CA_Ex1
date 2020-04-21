@@ -297,7 +297,7 @@ public:
 	int historySize;
 
 	BranchPredictor(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned fsmState,
-					bool isGlobalHist, bool isGlobalTable, int Shared) : isGlobalHist(isGlobalHist), isGlobalTable(isGlobalTable),
+					bool isGlobalHist, bool isGlobalTable, int shared) : isGlobalHist(isGlobalHist), isGlobalTable(isGlobalTable),
 																		 btb(btbSize ,tagSize),
 																		 fsm(isGlobalTable ,btbSize ,historySize ,fsmState),
 																		 history(isGlobalHist ,historySize ,btbSize, fsmState),
