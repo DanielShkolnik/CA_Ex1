@@ -70,10 +70,13 @@ public:
 	void addEntry(uint32_t pc ,uint32_t targetPc){
 		int i = indx(pc ,btbSize);
 		btb[i].target = targetPc;
-		uint32_t tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
-		//std::cout << tagt << std::endl;
-		btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
-		//std::cout << btb[i].tag << std::endl;
+
+		//uint32_t tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+        uint32_t tagt = pc << (32 -(2 + this->tagSize));
+
+		//btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
+        btb[i].tag = tagt >> (32 -(2 + this->tagSize) + 2);
+
 
 	}
 };
@@ -306,9 +309,14 @@ public:
 
 	bool doesExist(uint32_t pc){
 		int btbRow=indx(pc,this->btbSize);
-		uint32_t tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
-		tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
-		//std::cout << btb.btb[btbRow].tag << " == " << tag << " ";
+
+
+		//uint32_t tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+        uint32_t tag = pc << (32 -(2 + this->tagSize));
+
+		//tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
+        tag = tag >> (32 -(2 + this->tagSize) + 2);
+
 		if((uint32_t)(this->btb.btb[btbRow].tag) == tag) return true;
 		return false;
 
