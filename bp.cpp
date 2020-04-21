@@ -362,11 +362,11 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	int i = indx(pc ,bp->btbSize);
 	int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 	if(bp->doesExist(pc)){
-		bp->print(pc);
+		//bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}else{
-			std::cout << pc << "  flushed  " << std::endl;
+			//std::cout << pc << "  flushed  " << std::endl;
 			stats.flush_num++;
 			bp->fsm.weaken(i ,sharedi);
 		}
@@ -374,7 +374,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		if(!bp->isGlobalTable || bp->btb.btb[i].tag!=-1) bp->fsm.reset(i);
 		bp->btb.addEntry(pc, targetPc);
 		bp->history.reset(i);
-		bp->print(pc);
+		//bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}
@@ -385,7 +385,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		}
 	}
 	bp->history.update(i ,taken);
-	bp->print(pc);
+	//bp->print(pc);
 }
 
 void BP_GetStats(SIM_stats *curStats){
