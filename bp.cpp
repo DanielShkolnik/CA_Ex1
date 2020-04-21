@@ -154,9 +154,14 @@ public:
 	}
 
 	void reset(int row){
-		if(!isGlobalTable){
+		if(!isGlobalTable) {
+			for (unsigned i = 0; i < columns; i++) {
+				fsm[(row * columns) + i] = fsmState;
+			}
+		}
+		else{
 			for(unsigned i = 0 ; i < columns ; i++){
-				fsm[(row*columns)+i] = fsmState;
+				fsm[i] = fsmState;
 			}
 		}
 	}
