@@ -338,7 +338,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}else{
-			std::cout << pc << "  flushed  " << std::endl;
+			//std::cout << pc << "  flushed  " << std::endl;
 			stats.flush_num++;
 			bp->fsm.weaken(i ,bp->history(i));
 		}
@@ -351,7 +351,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}
 		else {
-			std::cout << pc << "  flushed  " << std::endl;
+			//std::cout << pc << "  flushed  " << std::endl;
 			stats.flush_num++;
 			bp->fsm.weaken(i ,bp->history(i));
 		}
