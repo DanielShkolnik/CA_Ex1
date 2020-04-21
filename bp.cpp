@@ -134,6 +134,14 @@ public:
 		}
 	}
 
+	void reset(int row){
+		if(!isGlobalTable){
+			for(int i = 0 ; i < column_size ; i++){
+				fsm[(row*column_size)+i] = fsmState;
+			}
+		}
+	}
+
 };
 class History{
 public:
@@ -141,8 +149,9 @@ public:
 	int size;
 	bool isGlobalHist;
 	int btbSize;
+	int fsmState;
 	History() = default;
-	History(bool isGlobalHist , unsigned historySize ,int btbSize):history(nullptr) ,size(historySize) ,isGlobalHist(isGlobalHist) ,btbSize(btbSize){
+	History(bool isGlobalHist , unsigned historySize ,int btbSize, int fsmState):history(nullptr) ,size(historySize) ,isGlobalHist(isGlobalHist) ,btbSize(btbSize), fsmState(fsmState){
 		if(!isGlobalHist) {
 			history = new unsigned[btbSize];
 			for(int i = 0 ; i < btbSize ; i++)
@@ -157,6 +166,9 @@ public:
 		}else{
 			return history[i];
 		}
+	}
+	void reset(int row){
+		if(!isGlobalHist) history[row]=0;
 	}
 	void update(int i ,bool taken){
 		unsigned* to_update = nullptr;
@@ -240,7 +252,7 @@ public:
 					bool isGlobalHist, bool isGlobalTable, int Shared) : isGlobalHist(isGlobalHist), isGlobalTable(isGlobalTable),
 																		 btb(btbSize ,tagSize),
 																		 fsm(isGlobalTable ,btbSize ,historySize ,fsmState),
-																		 history(isGlobalHist ,historySize ,btbSize),
+																		 history(isGlobalHist ,historySize ,btbSize, fsmState),
 																		 pc(0) ,tagSize(tagSize) ,shared(shared) ,btbSize(btbSize) {
 	}
 
@@ -291,8 +303,8 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 
 void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
+	int i = indx(pc ,bp->btbSize);
 	if(bp->doesExist(pc)){
-		int i = indx(pc ,bp->btbSize);
 		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}else{
@@ -302,8 +314,9 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		}
 	}else {
 		bp->btb.addEntry(pc, targetPc);
+		bp->history.reset(i);
+		bp->fsm.reset(i);
 	}
-	int i = indx(pc ,bp->btbSize);
 	if(taken) {
 		bp->fsm.strengthen(i, bp->history(i));
 	}else{
