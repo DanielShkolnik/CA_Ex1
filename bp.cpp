@@ -371,9 +371,9 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 			bp->fsm.weaken(i ,sharedi);
 		}
 	}else {
+		if(!bp->isGlobalTable || bp->btb.btb[i].tag!=-1) bp->fsm.reset(i);
 		bp->btb.addEntry(pc, targetPc);
 		bp->history.reset(i);
-		bp->fsm.reset(i);
 		bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
