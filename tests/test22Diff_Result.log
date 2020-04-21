@@ -1,2 +1,2 @@
 tests/test22 diff ---------- results ----------
-flush_num: 50105, br_num: 100000, size: 135b		      |	flush_num: 49897, br_num: 100000, size: 135b
+flush_num: 50105, br_num: 100000, size: 135b		      |	flush_num: 49899, br_num: 100000, size: 135b

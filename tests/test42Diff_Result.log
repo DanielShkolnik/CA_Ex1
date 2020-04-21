@@ -1,3 +1,2 @@
 tests/test42 diff ---------- results ----------
-0x1c54 T 0x1d6d4					      |	0x1c54 T 0x2b214
-flush_num: 50101, br_num: 100000, size: 220b		      |	flush_num: 50100, br_num: 100000, size: 220b
+0x1c54 T 0x1d6d4					      |	0x1c54 N 0x1c58
