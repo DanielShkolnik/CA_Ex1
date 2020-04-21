@@ -99,7 +99,7 @@ public:
 			}
 		}
 	}
-	void strengthen(int i , unsigned history){
+	void strengthen(int row , unsigned history){
 		if(isGlobalTable){
             if(fsm[history] == 1) {
                 fsm[history]--;
@@ -108,11 +108,11 @@ public:
                 fsm[history]++;
             }
 		}else{
-            if(fsm[(i*column_size)+history] ==1) {
-                fsm[(i*column_size)+history]--;
+            if(fsm[(row*column_size)+history] == 1) {
+                fsm[(row*column_size)+history]--;
             }
-            else if(fsm[(i*column_size)+history] ==2) {
-                fsm[(i*column_size)+history]++;
+            else if(fsm[(row*column_size)+history] ==2) {
+                fsm[(row*column_size)+history]++;
             }
 		}
 	}
@@ -334,6 +334,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	int i = indx(pc ,bp->btbSize);
 	if(bp->doesExist(pc)){
+		bp->print(pc);
 		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
 			bp->fsm.strengthen(i ,bp->history(i));
 		}else{
@@ -345,16 +346,16 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		bp->btb.addEntry(pc, targetPc);
 		bp->history.reset(i);
 		bp->fsm.reset(i);
-	}
-	bp->print(pc);
-	if(taken) {
-		bp->fsm.strengthen(i, bp->history(i));
-	}else{
-		bp->fsm.weaken(i, bp->history(i));
+		bp->print(pc);
+		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
+			bp->fsm.strengthen(i ,bp->history(i));
+		}
+		else {
+			bp->fsm.weaken(i ,bp->history(i));
+		}
 	}
 	bp->history.update(i ,taken);
 	bp->print(pc);
-
 }
 
 void BP_GetStats(SIM_stats *curStats){
