@@ -317,7 +317,7 @@ public:
 		//tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
         tag = tag >> (32 -(2 + this->tagSize) + 2);
 
-		if((uint32_t)(this->btb.btb[btbRow].tag) == tag) return true;
+		if(this->btb.btb[btbRow].tag != -1 && (uint32_t)(this->btb.btb[btbRow].tag) == tag) return true;
 		return false;
 
 	}
