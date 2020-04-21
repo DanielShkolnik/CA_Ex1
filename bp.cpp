@@ -17,6 +17,24 @@ int indx(uint32_t pc ,int btbSize){
 	return indx;
 }
 
+int sharedIndx( uint32_t pc, int history, unsigned historySize, int shared, int btbSize){
+	if(shared==NO_SHARE){
+		return indx(pc,btbSize);
+	}
+	else if(shared==LSB_SHARE){
+		uint32_t indx = pc >> 2;
+		indx = indx << (32 - historySize);
+		indx = indx >> (32 - historySize);
+		return indx^history;
+	}
+	else{
+		uint32_t indx = pc >> 16;
+		indx = indx << (32 - historySize);
+		indx = indx >> (32 - historySize);
+		return indx^history;
+	}
+}
+
 unsigned calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize, bool isGlobalHist,
 				  bool isGlobalTable){
 	if(isGlobalHist && isGlobalTable){
@@ -66,7 +84,8 @@ public:
 	unsigned columns;
 	unsigned fsmState;
 	int* fsm;
-	FSM(bool isGlobalTable , unsigned btbSize , unsigned historySize , unsigned fsmState):isGlobalTable(isGlobalTable) ,rows(-1) ,columns(pow(2,historySize)) ,fsm(nullptr) ,fsmState(fsmState){
+	FSM(bool isGlobalTable , unsigned btbSize , unsigned historySize , unsigned fsmState):
+	isGlobalTable(isGlobalTable) ,rows(-1) ,columns(pow(2,historySize)) ,fsm(nullptr) ,fsmState(fsmState){
 		if(isGlobalTable){
 			columns = pow(2 ,historySize);
 			rows = 1;
@@ -270,13 +289,14 @@ public:
 	//unsigned fsmState;
 	int shared;
 	unsigned btbSize;
+	int historySize;
 
 	BranchPredictor(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned fsmState,
 					bool isGlobalHist, bool isGlobalTable, int Shared) : isGlobalHist(isGlobalHist), isGlobalTable(isGlobalTable),
 																		 btb(btbSize ,tagSize),
 																		 fsm(isGlobalTable ,btbSize ,historySize ,fsmState),
 																		 history(isGlobalHist ,historySize ,btbSize, fsmState),
-																		 pc(0) ,tagSize(tagSize) ,shared(shared) ,btbSize(btbSize) {
+																		 pc(0) ,tagSize(tagSize) ,shared(shared) ,btbSize(btbSize),historySize(historySize) {
 	}
 
 	bool doesExist(uint32_t pc){
@@ -318,7 +338,8 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 	if(bp->doesExist(pc)){
 		//std::cout << "  does exist  " << std::endl;
 		int i = indx(pc ,bp->btbSize);
-		bool is_taken = bp->fsm.isTaken(i ,bp->history(i));
+		int sharedi=sharedIndx(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
+		bool is_taken = bp->fsm.isTaken(i ,sharedi);
 		if(is_taken){
 			*dst = bp->btb.btb[i].target;
 		}else{
@@ -334,27 +355,28 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	int i = indx(pc ,bp->btbSize);
+	int sharedi=sharedIndx(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 	if(bp->doesExist(pc)){
 		bp->print(pc);
-		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
-			bp->fsm.strengthen(i ,bp->history(i));
+		if(bp->fsm.isTaken(i ,sharedi) == taken){
+			bp->fsm.strengthen(i ,sharedi);
 		}else{
 			std::cout << pc << "  flushed  " << std::endl;
 			stats.flush_num++;
-			bp->fsm.weaken(i ,bp->history(i));
+			bp->fsm.weaken(i ,sharedi);
 		}
 	}else {
 		bp->btb.addEntry(pc, targetPc);
 		bp->history.reset(i);
 		bp->fsm.reset(i);
 		bp->print(pc);
-		if(bp->fsm.isTaken(i ,bp->history(i)) == taken){
-			bp->fsm.strengthen(i ,bp->history(i));
+		if(bp->fsm.isTaken(i ,sharedi) == taken){
+			bp->fsm.strengthen(i ,sharedi);
 		}
 		else {
 			std::cout << pc << "  flushed  " << std::endl;
 			stats.flush_num++;
-			bp->fsm.weaken(i ,bp->history(i));
+			bp->fsm.weaken(i ,sharedi);
 		}
 	}
 	bp->history.update(i ,taken);
