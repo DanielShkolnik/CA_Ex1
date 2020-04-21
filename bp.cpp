@@ -353,6 +353,7 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 		bp->fsm.weaken(i, bp->history(i));
 	}
 	bp->history.update(i ,taken);
+	bp->print(pc);
 
 }
 
