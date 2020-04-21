@@ -162,11 +162,11 @@ public:
 				fsm[(row * columns) + i] = fsmState;
 			}
 		}
-		else{
+		/*else{
 			for(unsigned i = 0 ; i < columns ; i++){
 				fsm[i] = fsmState;
 			}
-		}
+		 */
 	}
 
 	void print(int row){
@@ -379,8 +379,9 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 			bp->fsm.weaken(i ,sharedi);
 		}
 	}else {
-		if(!bp->isGlobalTable || bp->btb.btb[i].tag!=-1) bp->fsm.reset(i);
+		//if(!bp->isGlobalTable || bp->btb.btb[i].tag!=-1) bp->fsm.reset(i);
 		bp->btb.addEntry(pc, targetPc);
+        bp->fsm.reset(i);
 		bp->history.reset(i);
 		//bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
