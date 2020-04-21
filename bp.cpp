@@ -101,24 +101,36 @@ public:
 	}
 	void strengthen(int i , unsigned history){
 		if(isGlobalTable){
-			if(fsm[history] < 3) {
-				fsm[history]++;
-			}
+            if(fsm[history] == 1) {
+                fsm[history]--;
+            }
+            else if(fsm[history] == 2){
+                fsm[history]++;
+            }
 		}else{
-			if(fsm[(i*column_size)+history] < 3) {
-				fsm[(i*column_size)+history]++;
-			}
+            if(fsm[(i*column_size)+history] ==1) {
+                fsm[(i*column_size)+history]--;
+            }
+            else if(fsm[(i*column_size)+history] ==2) {
+                fsm[(i*column_size)+history]++;
+            }
 		}
 	}
 	void weaken(int i , unsigned history){
 		if(isGlobalTable){
-			if(fsm[history] > 0) {
-				fsm[history]--;
+			if(fsm[history] == 1 || fsm[history] == 0 ) {
+				fsm[history]++;
+			}
+			else if(fsm[history] == 2 || fsm[history] == 3 ){
+                fsm[history]--;
 			}
 		}else{
-			if(fsm[(i*column_size)+history] > 0) {
-				fsm[(i*column_size)+history]--;
+			if(fsm[(i*column_size)+history] ==1 || fsm[(i*column_size)+history] ==0) {
+				fsm[(i*column_size)+history]++;
 			}
+			else if(fsm[(i*column_size)+history] ==2 || fsm[(i*column_size)+history] ==3) {
+                fsm[(i*column_size)+history]--;
+            }
 		}
 	}
 
