@@ -1,7 +1,7 @@
 /* 046267 Computer Architecture - Spring 2020 - HW #1 */
 /* This file should hold your implementation of the predictor simulator */
 
-
+/*
 
 #include "bp_api.h"
 #include <bitset>
@@ -411,10 +411,10 @@ void BP_GetStats(SIM_stats *curStats){
 }
 
 
+*/
 
 
 
-/*
 
 #include "bp_api.h"
 
@@ -786,7 +786,7 @@ void BP_GetStats(SIM_stats *curStats){
     global_var_btb= nullptr;
     return;
 }
-*/
+
 
 
 
