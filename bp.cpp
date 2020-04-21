@@ -55,7 +55,7 @@ unsigned calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize,
 class BtbEntry{
 public:
 	//bool taken;
-	uint32_t tag;
+	int tag;
 	uint32_t target;
 	//int history;
 	//int* states;
