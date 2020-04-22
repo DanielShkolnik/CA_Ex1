@@ -13,6 +13,7 @@
 #define LSB_SHARE 1
 #define MID_SHARE 2
 
+//Returns the row number of the matching entry in BTB
 int indx(uint32_t pc ,int btbSize){
 	uint32_t indx = pc >> 2;
 	indx = indx << (32 - (int)log2(btbSize));
@@ -20,6 +21,7 @@ int indx(uint32_t pc ,int btbSize){
 	return indx;
 }
 
+//Returns the state_machine_number of the matching state_machine
 int sharedHistory( uint32_t pc, int history, unsigned historySize, int shared, int btbSize){
 	if(shared==NO_SHARE){
 		return history;
@@ -38,6 +40,7 @@ int sharedHistory( uint32_t pc, int history, unsigned historySize, int shared, i
 	}
 }
 
+//Returns the size of bits allocated in branch-predictor
 unsigned calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize, bool isGlobalHist,
 				  bool isGlobalTable){
 	if(isGlobalHist && isGlobalTable){
@@ -54,22 +57,23 @@ unsigned calculateSize(unsigned btbSize, unsigned historySize, unsigned tagSize,
 	}
 }
 
-
+//The data held in each row in the btb
 class BtbEntry{
 public:
-	//bool taken;
 	int tag;
 	uint32_t target;
-	//int history;
-	//int* states;
 	BtbEntry():tag(-1) ,target(0){}
 };
+//btb table
 class BTB{
 public:
 	BtbEntry* btb;
 	unsigned btbSize;
 	unsigned tagSize;
 	BTB(unsigned btbSize ,unsigned tagSize):btb(new BtbEntry[btbSize]) ,btbSize(btbSize) ,tagSize(tagSize){}
+	~BTB(){
+	    if(btb!= nullptr) delete[] btb;
+	}
 	void addEntry(uint32_t pc ,uint32_t targetPc){
 		int i = indx(pc ,btbSize);
 		btb[i].target = targetPc;
@@ -87,6 +91,8 @@ public:
         btb[i].target = targetPc;
 	}
 };
+
+//fsm table
 class FSM{
 public:
 	bool isGlobalTable;
@@ -113,6 +119,9 @@ public:
 			}
 		}
 	}
+	~FSM(){
+	    if(fsm!= nullptr) delete[] fsm;
+	}
 	bool isTaken(int i , unsigned history){
 		if(isGlobalTable){
 			if(fsm[history] > 1) {
@@ -137,7 +146,6 @@ public:
                 fsm[history]++;
             }
 		}else{
-		    //std::cout << "row: " << row << "  history: " << history << std::endl;
             if(fsm[(row*columns)+history] == 1) {
                 fsm[(row*columns)+history]--;
             }
@@ -155,7 +163,6 @@ public:
                 fsm[history]--;
 			}
 		}else{
-            //std::cout << "row: " << row << "  history: " << history << std::endl;
 			if(fsm[(row*columns)+history] ==1 || fsm[(row*columns)+history] ==0) {
 				fsm[(row*columns)+history]++;
 			}
@@ -171,11 +178,6 @@ public:
 				fsm[(row * columns) + i] = fsmState;
 			}
 		}
-		//else{
-		//	for(unsigned i = 0 ; i < columns ; i++){
-		//		fsm[i] = fsmState;
-		//	}
-
 	}
 
 	void print(int row){
@@ -193,6 +195,8 @@ public:
 	}
 
 };
+
+//BHR
 class History{
 public:
 	unsigned* history;
@@ -209,6 +213,12 @@ public:
 		}else{
 			history = new unsigned(0);
 		}
+	}
+	~History(){
+	    if(history!= nullptr){
+	        if(isGlobalHist) delete history;
+	        else delete[] history;
+	    }
 	}
 	unsigned operator()(int i){
 		if(isGlobalHist) {
@@ -293,6 +303,7 @@ public:
 	}
 
 };
+
 class BranchPredictor {
 public:
 	bool isGlobalHist;
@@ -357,7 +368,6 @@ int BP_init(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned f
 
 bool BP_predict(uint32_t pc, uint32_t *dst){
 	if(bp->doesExist(pc)){
-		//std::cout << "  does exist  " << std::endl;
 		int i = indx(pc ,bp->btbSize);
 		int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 		bool is_taken = bp->fsm.isTaken(i ,sharedi);
@@ -376,27 +386,24 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 	stats.br_num++;
 	int i = indx(pc ,bp->btbSize);
-    //std::cout <<"row: " << i << std::endl;
-    //std::cout <<"bp->history(i): " << bp->history(i) << std::endl;
 	int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
-    //std::cout <<"bp->history(i): " << sharedi << std::endl;
 
-    if  ( (taken && pred_dst==pc+4) || (!taken && pred_dst!=pc+4) || (taken && pred_dst!=targetPc)){
-        stats.flush_num++;
-    }
-    
 	if(bp->doesExist(pc)){
 		//bp->print(pc);
-		if(bp->fsm.isTaken(i ,sharedi) == taken){
+		bool isTaken=bp->fsm.isTaken(i ,sharedi);
+		if(isTaken == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}else{
-			//std::cout << pc << "  flushed  " << std::endl;
-			//stats.flush_num++;
 			bp->fsm.weaken(i ,sharedi);
 		}
+
+        if  ( (isTaken!=taken) || (taken && pred_dst!=targetPc)){
+            stats.flush_num++;
+        }
+
 		bp->btb.updateTarget(pc,targetPc);
+
 	}else {
-		//if(!bp->isGlobalTable || bp->btb.btb[i].tag!=-1) bp->fsm.reset(i);
 		bp->btb.addEntry(pc, targetPc);
 		//bp->print(pc);
         bp->fsm.reset(i);
@@ -406,408 +413,20 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
 			bp->fsm.strengthen(i ,sharedi);
 		}
 		else {
-			//std::cout << pc << "  flushed  " << std::endl;
-			//stats.flush_num++;
 			bp->fsm.weaken(i ,sharedi);
 		}
+
+        if (taken && pred_dst!=targetPc){
+            stats.flush_num++;
+        }
 	}
 	bp->history.update(i ,taken);
 	//bp->print(pc);
 }
 
 void BP_GetStats(SIM_stats *curStats){
-
 	*curStats = stats;
+	if(bp!= nullptr) delete bp;
 }
-
-
-
-
-
-
-/*
-#include "bp_api.h"
-
-
-#include <cmath>
-#include <cassert>
-#include <vector>
-#include <iostream>
-
-typedef enum {LOCAL=0,GLOBAL=1} table_type;
-typedef  enum {NOT_USING_SHARE=0,USING_SHARE_LSB=1,USING_SHARE_MID=2} share_type;
-typedef  enum {SNT,WNT,WT,ST} FSM_STATE;
-
-
-
-uint32_t cut_address(uint32_t adress , uint32_t chunk ,uint32_t div){
-    assert(chunk<32);
-    uint32_t res =adress;
-    res = res >> div;
-    uint32_t mask = 0xFFFFFFFF;
-    assert(32-chunk>=0);
-    mask = mask >> (32-chunk);
-    return mask & res ;
-}
-
-unsigned hash_func(uint32_t cur_pc, unsigned history , unsigned history_size ,share_type share_type ){
-    unsigned res;
-    unsigned mask=1;
-    for (unsigned i = 0; i < history_size-1; ++i) {
-        mask*=2;
-        mask++;
-    }
-    unsigned div;
-    switch (share_type){
-        case  NOT_USING_SHARE :
-            return history;
-        case USING_SHARE_LSB:
-            div=2;
-            break;
-        case USING_SHARE_MID:
-            div=16;
-            break;
-    }
-    res=cut_address(cur_pc,history_size,div);
-    return (res & mask) ^ history;
-}
-
-
-
-// fsm class
-class fsm
-{
-public:
-    FSM_STATE cur;
-    FSM_STATE default_state;
-
-public:
-    fsm (FSM_STATE default_s): cur(default_s) ,default_state(default_s) {}
-    void update(bool input){
-        switch (cur) {
-            case ST :
-                cur = (input) ? ST : WT;
-                break;
-            case WT :
-                cur = (input) ? ST : WNT;
-                break;
-            case WNT :
-                cur = (input) ? WT : SNT;
-                break;
-            case SNT :
-                cur = (input) ? WNT : SNT;
-                break;
-        }
-    }
-    FSM_STATE get(){
-        return cur;
-    }
-    void reset (){
-        cur=default_state;
-    }
-
-};
-
-
-class row
-{
-    uint32_t tag = 1;
-    std::vector<fsm>* fsm_table_pointer=nullptr;
-    uint32_t target_pc;
-    unsigned* history =nullptr;
-    table_type history_rule;
-    table_type fsm_rule;
-    unsigned history_size;
-    FSM_STATE default_state;
-
-public:
-    bool valid_bit=false;
-
-    row(uint32_t target_pc,unsigned  history_size,table_type history_rule,table_type fsm_rule,std::vector<fsm>* fsm_table_pointer
-            ,unsigned* history,FSM_STATE default_s): fsm_table_pointer(fsm_table_pointer) ,target_pc(target_pc)
-            ,history(history),history_rule(history_rule) , fsm_rule(fsm_rule),history_size(history_size),default_state(default_s)
-
-    {
-
-        if(history_rule == LOCAL){
-            //history = new unsigned(0);        //local history
-        } else{
-            this->history = history; //global history
-        }
-        if(fsm_rule == LOCAL){
-            //fsm_table_pointer = new std::vector<fsm>(std::pow(2,history_size),fsm(default_s)); //local fsm
-        } else{
-            this->fsm_table_pointer =fsm_table_pointer; //global fsm
-        }
-    }
-    ~row(){
-        if(fsm_rule == LOCAL){
-            if(fsm_table_pointer !=nullptr	){
-                delete  fsm_table_pointer;
-            }
-        }
-        if (history_rule == LOCAL){
-            if(history != nullptr){
-                delete  history;
-            }
-        }
-    }
-    row(const row& r)
-    {
-        tag=r.tag;
-        default_state=r.default_state;
-        target_pc=r.target_pc;
-        history_rule=r.history_rule;
-        fsm_rule=r.fsm_rule;
-        history_size=r.history_size;
-        if(history_rule == LOCAL){
-            history = new unsigned(0);        //local history
-        } else{
-            history = r.history; //global history
-        }
-        if (fsm_rule == LOCAL){
-            fsm_table_pointer = new std::vector<fsm>(std::pow(2,history_size),fsm(r.default_state));
-        }
-        else{
-            fsm_table_pointer =r.fsm_table_pointer;
-        }
-    }
-    row& operator=(const row& r){
-        if (this == &r){
-            return *this;
-        }
-        delete history;
-        delete fsm_table_pointer;
-        return *this;
-    }
-    uint32_t get_tag(){
-        return tag;
-    }
-
-    uint32_t get_dst(){
-        return target_pc;
-    }
-
-    void reset_history (){
-        *history=0;
-    }
-
-    void update_history (bool input){
-        *history=*(history)*2+input;
-        unsigned mask=1;
-        for (unsigned i = 0; i < history_size-1; ++i) {
-            mask*=2;
-            mask++;
-        }
-        *history=*history & mask;
-    }
-    //assume valid tag in the input
-    void update_tag(uint32_t new_tag){
-        tag = new_tag;
-    }
-    void update_dst(uint32_t new_dst){
-        target_pc = new_dst;
-    }
-
-    bool is_taken (uint32_t cur_pc,share_type share_type){
-        FSM_STATE res=(fsm_table_pointer)->operator[](hash_func(cur_pc,*history,history_size,share_type)).get();
-        return (res <= WNT) ? false : true ;
-    }
-
-    void reset_fsm_vector(){
-        for (unsigned i=0 ; i < fsm_table_pointer->size(); i++)
-        {
-            fsm_table_pointer->operator[](i).reset();
-        }
-    }
-
-    std::vector<fsm>* get_fsm_vector(){
-        return fsm_table_pointer;
-    }
-
-    unsigned get_history(){
-        return *history;
-    }
-};
-
-
-
-
-class btb
-{
-public:
-
-    std::vector<row>* b_data =nullptr;
-    unsigned  history_size;
-    unsigned  tag_size;
-    FSM_STATE default_state;
-    table_type history_rule;    //global or local gistory table
-    table_type fsm_rule;        //global or local fsm
-    share_type share_t;
-    std::vector<fsm>* fsm_g = nullptr;
-    unsigned* history_g = nullptr;
-    SIM_stats stats;
-
-
-public:
-    btb (){}
-    btb (unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned fsmState,
-         bool isGlobalHist, bool isGlobalTable, int Shared):
-            history_size(historySize),tag_size(tagSize),default_state((FSM_STATE)fsmState),history_rule((table_type)isGlobalHist),
-            fsm_rule((table_type)isGlobalTable),share_t((share_type)Shared)	 {
-
-        if(fsm_rule == GLOBAL){
-            fsm_g = new std::vector<fsm>(std::pow(2,historySize),fsm((FSM_STATE)fsmState));
-        }
-        if(history_rule == GLOBAL){
-            history_g = new unsigned(0); //global history
-        }
-
-        b_data=new std::vector<row>(btbSize,row(0,historySize,history_rule,fsm_rule,fsm_g,history_g,default_state));
-        stats.br_num=0;
-        stats.flush_num=0;
-        stats.size=btb_size_calc();
-
-    }
-    ~btb(){
-        if(fsm_rule == GLOBAL){
-            delete  fsm_g;
-        }
-
-        if(history_rule == GLOBAL){
-            delete history_g;
-        }
-        delete b_data;
-    }
-    SIM_stats get_stats(){
-        return stats;
-    }
-
-    //get the prediction address and the Taken/Not Taken prediction (Decode stage)
-    bool get_dst(uint32_t pc , uint32_t* dst){
-        row& req_row = b_data->operator [](cut_address(pc,log2((double)b_data->size()),2)); //div the offset 2 times.
-        if(!req_row.valid_bit || ( req_row.get_tag() != cut_address(pc,tag_size,2))) {
-            *dst = pc+4;
-            return false;
-        }
-        if (! req_row.is_taken(pc,share_t)){
-            *dst = pc+4;
-            return false;
-        }
-        *dst=req_row.get_dst();
-        return true;
-    }
-    //update the btb (EXE stage)
-    void update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst) {
-        stats.br_num++;
-        if  ( (taken && pred_dst==pc+4) || (!taken && pred_dst!=pc+4) || (taken && pred_dst!=targetPc)){
-            stats.flush_num++;
-        }
-        row& row = b_data->operator [](cut_address(pc,log2((double)b_data->size()),2)); //div the offset 2 times.
-        if(!known_branch(pc,targetPc,row)){
-
-            row.update_tag(cut_address(pc,tag_size,2));
-            if(history_rule == LOCAL){
-                row.reset_history();
-            }
-            if(fsm_rule == LOCAL){
-                row.reset_fsm_vector();
-            }
-        }
-        //step -update the current line to the btb
-        row.update_dst(targetPc);
-        row.get_fsm_vector()->operator[](hash_func(pc,row.get_history(),history_size,share_t)).update(taken); //update FSM
-        row.update_history(taken); //update history
-        row.valid_bit=true;
-    }
-
-
-
-    bool known_branch(uint32_t pc, uint32_t targetPc ,row row){
-        if(row.get_tag() != cut_address(pc,tag_size,2)){
-            return false; // tag conflict
-        }
-        return true;
-    }
-
-    //calc the size of the btb
-    int btb_size_calc(){
-        int btb_size=b_data->size();
-        int tag_table_size=(btb_size)*(tag_size + 30);
-        int history_table_size=0;
-        int fsm_table_size=0;
-        switch (history_rule){
-            case LOCAL :
-                history_table_size=btb_size*history_size;
-                break;
-            case GLOBAL :
-                history_table_size=history_size;
-                break;
-        }
-        switch (fsm_rule){
-            case LOCAL :
-                fsm_table_size=btb_size* (std::pow(2,history_size+1));
-                break;
-            case GLOBAL :
-                fsm_table_size= (std::pow(2,history_size+1));
-                break;
-        }
-        return history_table_size+fsm_table_size+tag_table_size;
-    }
-};
-
-btb* global_var_btb= nullptr; //global btb
-
-
-int BP_init(unsigned btbSize, unsigned historySize, unsigned tagSize, unsigned fsmState,
-            bool isGlobalHist, bool isGlobalTable, int Shared){
-    global_var_btb = new  btb(btbSize,historySize,tagSize,fsmState,isGlobalHist,isGlobalTable,Shared);
-    if(global_var_btb == nullptr){
-        return -1; //memory error
-    }
-    return 0;
-}
-
-
-bool BP_predict(uint32_t pc, uint32_t *dst){
-    return global_var_btb->get_dst(pc,dst);
-}
-
-void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
-    if(global_var_btb->history_g!= nullptr) std::cout << "history - " << global_var_btb->history_g[0] << "  ";
-    std::cout << "fsm - ";
-    if(global_var_btb->b_data!= nullptr){}
-        row& row = global_var_btb->b_data->operator [](cut_address(pc,log2((double)global_var_btb->b_data->size()),2));
-        for(auto i=row.get_fsm_vector()->begin(); i!=row.get_fsm_vector()->end(); i++){
-            std::cout << i->cur << ",";
-        }
-
-    std::cout << std::endl;
-
-    global_var_btb->update(pc,targetPc,taken,pred_dst);
-    if(global_var_btb->history_g!= nullptr)std::cout << "history - " << global_var_btb->history_g[0] << "  ";
-    std::cout << "fsm - ";
-    if(global_var_btb->b_data!= nullptr){}
-        for(auto i=row.get_fsm_vector()->begin(); i!=row.get_fsm_vector()->end(); i++){
-            std::cout << i->cur << ",";
-        }
-
-    //if(global_var_btb->fsm_g!= nullptr){
-    //  for(auto i=global_var_btb->fsm_g->begin(); i!=global_var_btb->fsm_g->end(); i++){
-    //    std::cout << i->cur << ",";
-    //    }
-    //}
-    std::cout << std::endl;
-    return ;
-}
-
-void BP_GetStats(SIM_stats *curStats){
-    *curStats = global_var_btb->get_stats();
-    delete  global_var_btb;
-    global_var_btb= nullptr;
-    return;
-}
-*/
-
 
 
