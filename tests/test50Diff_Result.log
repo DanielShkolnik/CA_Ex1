@@ -1,2 +1,0 @@
-tests/test50 diff ---------- results ----------
-flush_num: 50094, br_num: 100000, size: 400b		      |	flush_num: 50128, br_num: 100000, size: 400b

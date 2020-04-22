@@ -3,6 +3,7 @@
 
 
 
+
 #include "bp_api.h"
 #include <bitset>
 #include <math.h>
@@ -80,6 +81,10 @@ public:
         btb[i].tag = tagt >> (32 -(2 + this->tagSize) + 2);
 
 
+	}
+	void updateTarget(uint32_t pc , uint32_t targetPc){
+        int i = indx(pc ,btbSize);
+        btb[i].target = targetPc;
 	}
 };
 class FSM{
@@ -184,7 +189,6 @@ public:
 			for(unsigned i = 0 ; i < columns ; i++){
 				std::cout << fsm[(row*columns)+i] << ",";
 			}
-			std::cout << std::endl;
 		}
 	}
 
@@ -376,33 +380,39 @@ void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
     //std::cout <<"bp->history(i): " << bp->history(i) << std::endl;
 	int sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
     //std::cout <<"bp->history(i): " << sharedi << std::endl;
-	if(bp->doesExist(pc) && pred_dst==targetPc){
-		bp->print(pc);
+
+    if  ( (taken && pred_dst==pc+4) || (!taken && pred_dst!=pc+4) || (taken && pred_dst!=targetPc)){
+        stats.flush_num++;
+    }
+    
+	if(bp->doesExist(pc)){
+		//bp->print(pc);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}else{
 			//std::cout << pc << "  flushed  " << std::endl;
-			stats.flush_num++;
+			//stats.flush_num++;
 			bp->fsm.weaken(i ,sharedi);
 		}
+		bp->btb.updateTarget(pc,targetPc);
 	}else {
 		//if(!bp->isGlobalTable || bp->btb.btb[i].tag!=-1) bp->fsm.reset(i);
 		bp->btb.addEntry(pc, targetPc);
+		//bp->print(pc);
         bp->fsm.reset(i);
 		bp->history.reset(i);
-		bp->print(pc);
         sharedi=sharedHistory(pc,bp->history(i),bp->historySize,bp->shared,bp->btbSize);
 		if(bp->fsm.isTaken(i ,sharedi) == taken){
 			bp->fsm.strengthen(i ,sharedi);
 		}
 		else {
 			//std::cout << pc << "  flushed  " << std::endl;
-			stats.flush_num++;
+			//stats.flush_num++;
 			bp->fsm.weaken(i ,sharedi);
 		}
 	}
 	bp->history.update(i ,taken);
-	bp->print(pc);
+	//bp->print(pc);
 }
 
 void BP_GetStats(SIM_stats *curStats){
@@ -766,20 +776,27 @@ bool BP_predict(uint32_t pc, uint32_t *dst){
 void BP_update(uint32_t pc, uint32_t targetPc, bool taken, uint32_t pred_dst){
     if(global_var_btb->history_g!= nullptr) std::cout << "history - " << global_var_btb->history_g[0] << "  ";
     std::cout << "fsm - ";
-    if(global_var_btb->fsm_g!= nullptr){
-        for(auto i=global_var_btb->fsm_g->begin(); i!=global_var_btb->fsm_g->end(); i++){
+    if(global_var_btb->b_data!= nullptr){}
+        row& row = global_var_btb->b_data->operator [](cut_address(pc,log2((double)global_var_btb->b_data->size()),2));
+        for(auto i=row.get_fsm_vector()->begin(); i!=row.get_fsm_vector()->end(); i++){
             std::cout << i->cur << ",";
         }
-    }
+
     std::cout << std::endl;
+
     global_var_btb->update(pc,targetPc,taken,pred_dst);
     if(global_var_btb->history_g!= nullptr)std::cout << "history - " << global_var_btb->history_g[0] << "  ";
     std::cout << "fsm - ";
-    if(global_var_btb->fsm_g!= nullptr){
-        for(auto i=global_var_btb->fsm_g->begin(); i!=global_var_btb->fsm_g->end(); i++){
+    if(global_var_btb->b_data!= nullptr){}
+        for(auto i=row.get_fsm_vector()->begin(); i!=row.get_fsm_vector()->end(); i++){
             std::cout << i->cur << ",";
         }
-    }
+
+    //if(global_var_btb->fsm_g!= nullptr){
+    //  for(auto i=global_var_btb->fsm_g->begin(); i!=global_var_btb->fsm_g->end(); i++){
+    //    std::cout << i->cur << ",";
+    //    }
+    //}
     std::cout << std::endl;
     return ;
 }
