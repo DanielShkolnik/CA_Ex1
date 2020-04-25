@@ -78,11 +78,11 @@ public:
 		int i = indx(pc ,btbSize);
 		btb[i].target = targetPc;
 
-		//uint32_t tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
-        uint32_t tagt = pc << (32 -(2 + this->tagSize));
+		uint32_t tagt = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+        //uint32_t tagt = pc << (32 -(2 + this->tagSize));
 
-		//btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
-        btb[i].tag = tagt >> (32 -(2 + this->tagSize) + 2);
+		btb[i].tag = tagt >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
+        //btb[i].tag = tagt >> (32 -(2 + this->tagSize) + 2);
 
 
 	}
@@ -330,11 +330,11 @@ public:
 		int btbRow=indx(pc,this->btbSize);
 
 
-		//uint32_t tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
-        uint32_t tag = pc << (32 -(2 + this->tagSize));
+		uint32_t tag = pc << (32 -(2 + (int)log2(this->btbSize) + this->tagSize));
+        //uint32_t tag = pc << (32 -(2 + this->tagSize));
 
-		//tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
-        tag = tag >> (32 -(2 + this->tagSize) + 2);
+		tag = tag >> (32 -(2 + (int)log2(this->btbSize) + this->tagSize) + 2 + (int)log2(this->btbSize));
+        //tag = tag >> (32 -(2 + this->tagSize) + 2);
 
 		if(this->btb.btb[btbRow].tag != -1 && (uint32_t)(this->btb.btb[btbRow].tag) == tag) return true;
 		return false;
